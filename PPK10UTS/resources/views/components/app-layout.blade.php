@@ -9,16 +9,28 @@
 </head>
 <body class="bg-gray-50">
     <nav class="bg-white shadow px-6 py-3 flex justify-between items-center">
-        <span class="font-bold">PPK 2026</span>
-        @auth
-            <div class="flex items-center gap-4 text-sm">
-                <span>{{ auth()->user()->name }} ({{ auth()->user()->role }})</span>
+        <div class="flex items-center gap-6">
+            <a href="{{ route('home') }}" class="font-bold">PPK 2026</a>
+            <a href="{{ route('catalog.index') }}" class="text-sm text-gray-600 hover:text-blue-600">Katalog Fasilitas</a>
+            @auth
+                @if (auth()->user()->isPengguna())
+                    <a href="{{ route('reservations.index') }}" class="text-sm text-gray-600 hover:text-blue-600">Reservasi Saya</a>
+                @endif
+            @endauth
+        </div>
+
+        <div class="flex items-center gap-4 text-sm">
+            @auth
+                <span class="text-gray-600">{{ auth()->user()->name }} ({{ auth()->user()->role }})</span>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button class="text-red-600">Logout</button>
                 </form>
-            </div>
-        @endauth
+            @else
+                <a href="{{ route('login') }}" class="text-blue-600 font-medium">Login</a>
+                <a href="{{ route('register') }}" class="text-gray-600 hover:text-blue-600">Daftar</a>
+            @endauth
+        </div>
     </nav>
 
     <main>

@@ -2,15 +2,22 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\FacilityController;
+use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\ReservationController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | Rute untuk scope Anggota 1: Auth, User Management, Facility Master Data
-| Rute untuk fitur reservasi & laporan ditambahkan oleh anggota tim lain.
+| Rute untuk scope Anggota 2: Katalog Fasilitas & Reservasi (ditambahkan di sini
+| karena di-take over dari anggota yang berhalangan)
+| Rute untuk fitur laporan/approval Petugas ditambahkan oleh anggota tim lain.
 |--------------------------------------------------------------------------
 */
-Route::get('/', fn () => redirect()->route('login'));
+
+// Halaman utama: katalog fasilitas (US 1 & 2), bisa diakses Pengunjung tanpa login.
+Route::get('/', [CatalogController::class, 'index'])->name('home');
+
 // ----- Guest (Pengunjung) -----
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
@@ -24,14 +31,40 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
-// ----- Pengguna (dashboard umum, dibuat placeholder, dilengkapi anggota lain) -----
+// ----- Katalog Fasilitas (US 1 & 2) — publik, tanpa auth, diakses Pengunjung & Pengguna -----
+Route::get('/facilities', [CatalogController::class, 'index'])->name('catalog.index');
+Route::get('/facilities/{facility}', [CatalogController::class, 'show'])->name('catalog.show');
+
+// ----- Pengguna (dashboard umum, dilengkapi anggota lain) -----
 Route::middleware(['auth', 'role:pengguna,admin,petugas'])->group(function () {
     Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
 });
 
+// ----- Reservasi (US 3, 4, 5) — khusus role Pengguna -----
+Route::middleware(['auth', 'role:pengguna'])->group(function () {
+    Route::get('/facilities/{facility}/reserve', [ReservationController::class, 'create'])->name('reservations.create');
+    Route::post('/facilities/{facility}/reserve', [ReservationController::class, 'store'])->name('reservations.store');
+    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::delete('/reservations/{reservation}', [ReservationController::class, 'cancel'])->name('reservations.cancel');
+});
+
 // ----- Petugas -----
 Route::middleware(['auth', 'role:petugas'])->group(function () {
-    Route::get('/petugas/dashboard', fn () => view('petugas.dashboard'))->name('petugas.dashboard');
+    Route::get('/petugas/dashboard', function () {
+        $pendingReservations = \App\Models\Reservation::with(['facility', 'user'])
+            ->where('status', 'pending')
+            ->latest('start_time')
+            ->take(10)
+            ->get();
+
+        return view('petugas.dashboard', [
+            'pendingReservations' => $pendingReservations,
+            'pendingCount' => \App\Models\Reservation::where('status', 'pending')->count(),
+            'approvedTodayCount' => \App\Models\Reservation::where('status', 'approved')
+                ->whereDate('updated_at', today())
+                ->count(),
+        ]);
+    })->name('petugas.dashboard');
 });
 
 // ----- Admin -----
