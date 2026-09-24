@@ -20,6 +20,11 @@
                 <div class="font-semibold">Lihat Katalog Publik</div>
                 <div class="text-sm text-gray-500">Cek tampilan katalog fasilitas seperti yang dilihat Pengunjung</div>
             </a>
+
+            <a href="{{ route('admin.exports.index') }}" class="block p-4 bg-white rounded shadow hover:shadow-md">
+                <div class="font-semibold">Rekap Fasilitas</div>
+                <div class="text-sm text-gray-500">Lihat rekap data fasilitas, unduh CSV/PDF</div>
+            </a>
         </div>
     </div>
 </x-app-layout>

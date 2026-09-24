@@ -15,6 +15,11 @@
                 <div class="font-semibold">Reservasi Saya</div>
                 <div class="text-sm text-gray-500">Lihat riwayat & status reservasi</div>
             </a>
+
+            <a href="{{ route('reports.index') }}" class="block p-4 bg-white rounded shadow hover:shadow-md">
+                <div class="font-semibold">Laporan Kerusakan</div>
+                <div class="text-sm text-gray-500">Laporkan & pantau kerusakan fasilitas</div>
+            </a>
         </div>
     </div>
 </x-app-layout>
