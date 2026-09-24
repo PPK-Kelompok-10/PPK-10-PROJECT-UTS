@@ -10,7 +10,15 @@
 <body class="bg-gray-50">
     <nav class="bg-white shadow px-6 py-3 flex justify-between items-center">
         <div class="flex items-center gap-6">
-            <a href="{{ route('home') }}" class="font-bold">PPK 2026</a>
+            @php
+                $homeUrl = match (auth()->user()?->role) {
+                    'admin' => route('admin.dashboard'),
+                    'petugas' => route('petugas.dashboard'),
+                    'pengguna' => route('dashboard'),
+                    default => route('home'),
+                };
+            @endphp
+            <a href="{{ $homeUrl }}" class="font-bold">PPK 2026</a>
             <a href="{{ route('catalog.index') }}" class="text-sm text-gray-600 hover:text-blue-600">Katalog Fasilitas</a>
             @auth
                 @if (auth()->user()->isPengguna())
