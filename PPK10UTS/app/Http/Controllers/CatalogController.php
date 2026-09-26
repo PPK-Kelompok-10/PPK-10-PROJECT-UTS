@@ -47,7 +47,11 @@ class CatalogController extends Controller
 
         $slots = $this->buildDaySlots($date, $bookedRanges);
 
-        return view('catalog.show', compact('facility', 'date', 'slots'));
+        // Cegah browser menampilkan halaman lama dari cache (misal lewat tombol Back)
+        // setelah reservasi dibatalkan — pastikan ketersediaan slot selalu data terbaru.
+        return response()
+            ->view('catalog.show', compact('facility', 'date', 'slots'))
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }
 
     /**

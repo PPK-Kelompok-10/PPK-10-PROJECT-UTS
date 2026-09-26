@@ -16,7 +16,8 @@ class ReservationController extends Controller
     {
         abort_if($facility->status !== 'aktif', 422, 'Fasilitas ini sedang tidak dapat direservasi.');
 
-        $date = $request->filled('date') ? $request->date : now()->toDateString();
+        // Reservasi wajib H-1, jadi default tanggal di form adalah besok, bukan hari ini.
+        $date = $request->filled('date') ? $request->date : now()->addDay()->toDateString();
         $startTime = $request->query('start');
         $endTime = $request->query('end');
 
