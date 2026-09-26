@@ -18,10 +18,20 @@
             Slot waktu tersedia/tidak tersedia. @guest Detail pemohon & tujuan penggunaan tidak ditampilkan untuk publik. @endguest
         </p>
 
+        @if ($date->isToday())
+            <p class="text-xs text-amber-600 mb-3">
+                Reservasi untuk hari ini sudah tidak bisa diajukan (wajib maksimal H-1) — pilih tanggal besok atau setelahnya.
+            </p>
+        @endif
+
         <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
             @foreach ($slots as $slot)
                 @php
-                    $canReserve = $slot['available'] && auth()->check() && auth()->user()->isPengguna() && $facility->status === 'aktif';
+                    $canReserve = $slot['available']
+                        && auth()->check()
+                        && auth()->user()->isPengguna()
+                        && $facility->status === 'aktif'
+                        && !$date->isToday();
                 @endphp
                 @if ($canReserve)
                     <a href="{{ route('reservations.create', ['facility' => $facility, 'date' => $date->toDateString(), 'start' => $slot['start'], 'end' => $slot['end']]) }}"

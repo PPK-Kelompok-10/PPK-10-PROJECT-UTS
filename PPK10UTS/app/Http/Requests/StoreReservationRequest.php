@@ -19,7 +19,9 @@ class StoreReservationRequest extends FormRequest
     {
         return [
             'purpose' => ['required', 'string', 'max:255'],
-            'date' => ['required', 'date', 'after_or_equal:today'],
+            // Ketentuan baru: reservasi wajib diajukan MAKSIMAL H-1 — tidak boleh untuk hari
+            // yang sama (harus 'after:today', bukan 'after_or_equal:today').
+            'date' => ['required', 'date', 'after:today'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i'],
         ];
@@ -29,7 +31,7 @@ class StoreReservationRequest extends FormRequest
     {
         return [
             'purpose.required' => 'Tujuan penggunaan wajib diisi.',
-            'date.after_or_equal' => 'Tanggal reservasi tidak boleh di masa lalu.',
+            'date.after' => 'Reservasi harus diajukan maksimal H-1 (minimal untuk besok, tidak bisa untuk hari ini).',
             'start_time.date_format' => 'Format jam mulai tidak valid.',
             'end_time.date_format' => 'Format jam selesai tidak valid.',
         ];

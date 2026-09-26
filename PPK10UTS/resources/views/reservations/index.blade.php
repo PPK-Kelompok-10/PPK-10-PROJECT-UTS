@@ -29,13 +29,18 @@
                     </div>
 
                     @if ($r->canBeCancelledBy(auth()->user()))
-                        <form method="POST" action="{{ route('reservations.cancel', $r) }}" class="mt-3"
+                        <form method="POST" action="{{ route('reservations.cancel', $r) }}" class="mt-3 inline"
                               onsubmit="return confirm('Batalkan reservasi ini?')">
                             @csrf
                             @method('DELETE')
                             <button class="text-sm text-red-600">Batalkan Reservasi</button>
                         </form>
                     @endif
+
+                    <a href="{{ route('catalog.show', ['facility' => $r->facility, 'date' => $r->start_time->toDateString()]) }}"
+                       class="text-sm text-blue-600 mt-3 inline-block ml-3">
+                        Lihat ketersediaan fasilitas ini
+                    </a>
                 </div>
             @empty
                 <p class="text-gray-400">Belum ada reservasi. <a href="{{ route('catalog.index') }}" class="text-blue-600">Cari fasilitas</a>.</p>
