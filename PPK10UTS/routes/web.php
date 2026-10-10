@@ -1,12 +1,15 @@
 <?php
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\FacilityController;
-use App\Http\Controllers\CatalogController;
-use App\Http\Controllers\ReservationController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\Petugas\ReportResolutionController;
+
 use App\Http\Controllers\Admin\ExportReportController;
+use App\Http\Controllers\Admin\FacilityController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\Petugas\DashboardController;
+use App\Http\Controllers\Petugas\ReportResolutionController;
+use App\Http\Controllers\Petugas\ReservationApprovalController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReservationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -74,27 +77,10 @@ Route::get('/reports/{report}/photo', [ReportController::class, 'photo'])
 // ----- Petugas -----
 
 Route::middleware(['auth', 'role:petugas'])->group(function () {
-    Route::get('/petugas/dashboard', function () {
-        $pendingReservations = \App\Models\Reservation::with(['facility', 'user'])
-            ->where('status', 'pending')
-            ->latest('start_time')
-            ->take(10)
-            ->get();
-
-        // Antrean laporan kerusakan (Anggota 4): yang paling lama menunggu tampil paling atas.
-        $openReports = \App\Models\Report::with(['facility', 'user'])
-            ->open()
-            ->oldest()
-            ->take(10)
-            ->get();
-
-        return view('petugas.dashboard', [
-            'pendingReservations' => $pendingReservations,
-            'pendingCount' => \App\Models\Reservation::where('status', 'pending')->count(),
-            'openReports' => $openReports,
-            'openReportsCount' => \App\Models\Report::open()->count(),
-        ]);
-    })->name('petugas.dashboard');
+    Route::get('/petugas/dashboard', [DashboardController::class, 'index'])->name('petugas.dashboard');
+    Route::patch('/petugas/reservations/{reservation}/approve', [ReservationApprovalController::class, 'approve'])->name('petugas.reservations.approve');
+    Route::patch('/petugas/reservations/{reservation}/reject', [ReservationApprovalController::class, 'reject'])->name('petugas.reservations.reject');
+    Route::patch('/petugas/reservations/{reservation}/cancel', [ReservationApprovalController::class, 'cancel'])->name('petugas.reservations.cancel');
 });
 
 // ----- Petugas: penanganan laporan & status fasilitas (US 11 & 12) -----
