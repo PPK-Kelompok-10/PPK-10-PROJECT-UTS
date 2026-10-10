@@ -1,7 +1,7 @@
 <x-app-layout title="Laporan Kerusakan">
     <div class="max-w-6xl mx-auto mt-10 p-6">
         <h1 class="text-xl font-bold mb-1">Laporan Kerusakan</h1>
-        <p class="text-sm text-gray-500 mb-6">Tangani laporan dari pengguna, mulai dari yang paling lama menunggu.</p>
+        <p class="text-sm text-gray-500 mb-6">Tangani laporan kerusakan fasilitas dari pengguna.</p>
 
         @if (session('status'))
             <div class="mb-4 p-3 rounded bg-green-50 text-green-800 text-sm">{{ session('status') }}</div>
